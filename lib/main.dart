@@ -74,7 +74,7 @@ class _MyLargeTitleState extends State<MyLargeTitle> {
   Widget build(BuildContext context) {
     print('build!');
     return Text(
-      'My Large TItle',
+      'My Large Title',
       style: TextStyle(
         fontSize: 30,
         color: Theme.of(context).textTheme.titleLarge?.color,
