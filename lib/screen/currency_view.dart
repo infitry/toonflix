@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/button.dart';
-import '../widgets/currency_card.dart';
+import '../widget/button.dart';
+import '../widget/currency_card.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
