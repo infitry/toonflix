@@ -3,6 +3,7 @@ import 'package:toonflix/service/webtoon_service.dart';
 
 import '../model/webtoon_detail_model.dart';
 import '../model/webtoon_episode_model.dart';
+import '../widget/episode_widget.dart';
 
 class DetailScreen extends StatefulWidget {
   final String title, thumb, id;
@@ -40,75 +41,94 @@ class _DetailScreenState extends State<DetailScreen> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 50,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 50,
+            vertical: 50,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Column(
             children: [
-              Hero(
-                tag: widget.id,
-                child: Container(
-                  height: 300,
-                  width: 250,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 15,
-                        offset: const Offset(10, 10),
-                        color: Colors.black.withOpacity(0.8),
-                      )
-                    ],
-                    borderRadius: BorderRadius.circular(10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Hero(
+                    tag: widget.id,
+                    child: Container(
+                      height: 300,
+                      width: 250,
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 15,
+                            offset: const Offset(10, 10),
+                            color: Colors.black.withOpacity(0.8),
+                          )
+                        ],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Image.network(
+                        widget.thumb,
+                        width: 250,
+                        height: 300,
+                      ),
+                    ),
                   ),
-                  child: Image.network(
-                    widget.thumb,
-                    width: 250,
-                    height: 300,
-                  ),
-                ),
+                ],
               ),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                  future: webtoonDetail,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            snapshot.data!.about,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w200,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            '${snapshot.data!.genre} / ${snapshot.data!.age}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    return const Text('...');
+                  }),
+              const SizedBox(
+                height: 20,
+              ),
+              FutureBuilder(
+                future: webtoonEpisodes,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: [
+                        for (var episode in snapshot.data!)
+                          Episode(episode: episode, webtoonId: widget.id)
+                      ],
+                    );
+                  }
+                  return Container();
+                },
+              )
             ],
           ),
-          const SizedBox(
-            height: 25,
-          ),
-          FutureBuilder(
-              future: webtoonDetail,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 50),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          snapshot.data!.about,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w200,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          '${snapshot.data!.genre} / ${snapshot.data!.age}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                return const Text('...');
-              }),
-        ],
+        ),
       ),
     );
   }
