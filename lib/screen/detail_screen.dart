@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toonflix/service/webtoon_service.dart';
 
 import '../model/webtoon_detail_model.dart';
@@ -15,14 +16,47 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+  static const likeWebtoonsKey = "likedWebtoons";
   late Future<WebtoonDetailModel> webtoonDetail;
   late Future<List<WebtoonEpisodeModel>> webtoonEpisodes;
+  late SharedPreferences prefer;
+  bool isLike = false;
+
+  Future initPreferences() async {
+    prefer = await SharedPreferences.getInstance();
+    final likedWebtoons = prefer.getStringList(likeWebtoonsKey);
+    if (likedWebtoons != null) {
+      if (likedWebtoons.contains(widget.id)) {
+        setState(() {
+          isLike = true;
+        });
+      }
+    } else {
+      await prefer.setStringList(likeWebtoonsKey, []);
+    }
+  }
+
+  onHeartTap() async {
+    final likeWebtoons = prefer.getStringList(likeWebtoonsKey);
+    if (likeWebtoons != null) {
+      if (isLike) {
+        likeWebtoons.remove(widget.id);
+      } else {
+        likeWebtoons.add(widget.id);
+      }
+      prefer.setStringList(likeWebtoonsKey, likeWebtoons);
+    }
+    setState(() {
+      isLike = !isLike;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     webtoonDetail = WebtoonService.getWebtoonById(widget.id);
     webtoonEpisodes = WebtoonService.getWebtoonEpisodesById(widget.id);
+    initPreferences();
   }
 
   @override
@@ -33,6 +67,14 @@ class _DetailScreenState extends State<DetailScreen> {
         elevation: 2,
         backgroundColor: Colors.white,
         foregroundColor: Colors.green,
+        actions: [
+          IconButton(
+            onPressed: onHeartTap,
+            icon: Icon(
+              isLike ? Icons.favorite : Icons.favorite_border_outlined,
+            ),
+          )
+        ],
         title: Text(
           widget.title,
           style: const TextStyle(
