@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:toonflix/model/webtoon_model.dart';
 
-class ApiService {
-  final String baseUrl = "https://webtoon-crawler.nomadcoders.workers.dev";
-  final String todayPath = "/today";
+class WebtoonService {
+  static const String baseUrl =
+      "https://webtoon-crawler.nomadcoders.workers.dev";
+  static const String todayPath = "/today";
 
-  Future<List<WebtoonModel>> getTodayWebtoon() async {
+  static Future<List<WebtoonModel>> getTodayWebtoons() async {
     final url = Uri.parse('$baseUrl$todayPath');
     final response = await http.get(url);
     if (response.statusCode == 200) {
